@@ -1,0 +1,11 @@
+syntax = "proto3";
+package com.zbc.netty.nio.protobuf;
+
+option java_package = "com.zbc.netty.nio.protobuf";
+option java_outer_classname = "ObjectBean";
+
+
+message ObjectBeanReq {
+    int32 num = 1;
+    string name = 2;
+}

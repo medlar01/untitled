@@ -2,7 +2,7 @@ syntax = "proto3";
 package com.zbc.netty.nio.protobuf;
 
 option java_package = "com.zbc.netty.nio.protobuf";
-option java_outer_classname = "ObjectBeanProto";
+option java_outer_classname = "ObjectBeanSerializer";
 
 
 message ObjectBean {

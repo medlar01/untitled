@@ -31,7 +31,7 @@ public class EchoServer {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
                             ch.pipeline().addLast(new ProtobufVarint32FrameDecoder());
-                            ch.pipeline().addLast(new ProtobufDecoder(ObjectBeanProto.ObjectBean.getDefaultInstance()));
+                            ch.pipeline().addLast(new ProtobufDecoder(ObjectBeanSerializer.ObjectBean.getDefaultInstance()));
                             ch.pipeline().addLast(new ServerHandler());
                         }
                     }).bind()

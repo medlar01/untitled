@@ -21,7 +21,7 @@ public class ClientHandler extends ChannelHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        log.info("连接成功!发送实体");
+        log.debug("连接成功!发送实体");
         ObjectBeanSerializer.ObjectBean ob = ObjectBeanSerializer.ObjectBean.newBuilder()
                 .setNum(1000)
                 .setName("李白不太白!")

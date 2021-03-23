@@ -1,5 +1,6 @@
 package com.zbc.netty.nio.protobuf;
 
+import com.google.protobuf.TextFormat;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
@@ -25,7 +26,7 @@ public class ServerHandler extends ChannelHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ObjectBeanSerializer.ObjectBean ob = (ObjectBeanSerializer.ObjectBean) msg;
-        log.info("接收到数据:\r\n" + ob);
+        log.debug("接收到数据:\r\n" + TextFormat.printToUnicodeString(ob));
     }
 
     @Override

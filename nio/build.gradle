@@ -17,12 +17,16 @@ dependencies {
     implementation library['logback-classic']
     implementation library['msgpack']
     implementation library['jackson-msgpack']
-    implementation 'com.google.protobuf:protobuf-java:3.7.1'
+    implementation library['lombok']
+    annotationProcessor library['lombok']
+    implementation library['protobuf-java']
+    implementation library['jboss-marshalling']
+    implementation library['jboss-marshalling-serial']
 }
 
 protobuf {
     protoc {
-        artifact = 'com.google.protobuf:protoc:3.7.1'
+        artifact = library['protoc']
     }
     generatedFilesBaseDir = 'build/generated/sources/protobuf/'
 }

@@ -22,6 +22,7 @@ dependencies {
     implementation library['protobuf-java']
     implementation library['jboss-marshalling']
     implementation library['jboss-marshalling-serial']
+    implementation library['activation']
 }
 
 protobuf {

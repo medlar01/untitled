@@ -56,6 +56,7 @@ public class HttpFileHandler extends SimpleChannelInboundHandler<FullHttpRequest
         }
         if (file.isFile()) {
             sendFile(ctx, msg, file);
+            return;
         }
         sendError(ctx, BAD_REQUEST);
     }
@@ -66,8 +67,8 @@ public class HttpFileHandler extends SimpleChannelInboundHandler<FullHttpRequest
             long fileLength = raFile.length();
             HttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK);
             HttpHeaderUtil.setContentLength(response, fileLength);
-            MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
-            response.headers().set(CONTENT_TYPE, mimeTypesMap.getContentType(file.getPath()));
+            response.headers().set(HttpHeaderNames.CONTENT_TYPE, "application/octet-stream");
+            response.headers().add(HttpHeaderNames.CONTENT_DISPOSITION, String.format("attachment; filename=\"%s\"", file.getName()));
             if (HttpHeaderUtil.isKeepAlive(request)) {
                 response.headers().set(CONNECTION, HttpHeaderValues.KEEP_ALIVE);
             }
@@ -78,6 +79,7 @@ public class HttpFileHandler extends SimpleChannelInboundHandler<FullHttpRequest
                         @Override
                         public void operationComplete(ChannelProgressiveFuture future) throws Exception {
                             log.debug("Transfer complete.");
+                            raFile.close();
                         }
 
                         @Override
@@ -86,9 +88,9 @@ public class HttpFileHandler extends SimpleChannelInboundHandler<FullHttpRequest
                         }
                     });
             ChannelFuture channelFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
-            if (!HttpHeaderUtil.isKeepAlive(request)) {
-                channelFuture.addListener(ChannelFutureListener.CLOSE);
-            }
+//            if (!HttpHeaderUtil.isKeepAlive(request)) {
+//                channelFuture.addListener(ChannelFutureListener.CLOSE);
+//            }
         } catch (FileNotFoundException e) {
             log.debug("文件不存在!", e);
             sendError(ctx, NOT_FOUND);

@@ -11,6 +11,8 @@ import io.netty.handler.codec.http.HttpChunkedInput;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 
 import java.net.InetSocketAddress;
@@ -40,7 +42,9 @@ public class HttpFileServer {
             sbp.group(group, workerGroup)
                     .localAddress(new InetSocketAddress(portNumber))
                     .channel(NioServerSocketChannel.class)
-                    .option(ChannelOption.SO_BACKLOG, 100)
+                    .handler(new LoggingHandler(LogLevel.INFO))
+                    .option(ChannelOption.SO_BACKLOG, 128)
+                    .childOption(ChannelOption.SO_KEEPALIVE, true)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {

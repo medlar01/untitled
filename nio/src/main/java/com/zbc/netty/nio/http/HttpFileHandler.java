@@ -1,10 +1,9 @@
 package com.zbc.netty.nio.http;
 
 import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
+import io.netty.handler.stream.ChunkedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +13,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.Objects;
 
-import static io.netty.handler.codec.http.HttpHeaderNames.CONNECTION;
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
@@ -31,8 +29,6 @@ import static io.netty.handler.codec.http.HttpResponseStatus.*;
  */
 public class HttpFileHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     private final static Logger log = LoggerFactory.getLogger(HttpFileHandler.class);
-    private final static String HTTP_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss zzz";
-    private final static String HTTP_DATE_GMT_TIMEZONE = "GMT";
     private final static String BASE_URL = "E:/";
 
     @Override
@@ -64,20 +60,50 @@ public class HttpFileHandler extends SimpleChannelInboundHandler<FullHttpRequest
 
     private void sendFile(ChannelHandlerContext ctx, FullHttpRequest request, File file) throws IOException, ParseException {
         try {
-            RandomAccessFile raf = new RandomAccessFile(file, "r");
-            long length = raf.length();
-            MimetypesFileTypeMap mftm = new MimetypesFileTypeMap();
-            FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK, Unpooled.copiedBuffer(fileToByte(file)));
-            response.headers().set(HttpHeaderNames.CONTENT_LENGTH, length + "")
-                    .set(CONTENT_TYPE, mftm.getContentType(file))
-                    .set(CONNECTION, HttpHeaderValues.KEEP_ALIVE);
-            ctx.writeAndFlush(response)
-                    .addListener(ChannelFutureListener.CLOSE);
+            RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r");
+            long fileLength = randomAccessFile.length();
+            HttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
+            HttpHeaderUtil.setContentLength(response, fileLength);
+            setContentTypeHeader(response, file);
+            if (HttpHeaderUtil.isKeepAlive(request)) {
+                response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+            }
+            ctx.write(response);
+
+
+            ChannelFuture sendFileFuture = ctx.write(new ChunkedFile(randomAccessFile, 0, fileLength, 8192), ctx.newProgressivePromise());
+            sendFileFuture.addListener(new ChannelProgressiveFutureListener() {
+                @Override
+                public void operationProgressed(ChannelProgressiveFuture future, long progress, long total) {
+                    if (total < 0) {
+                        log.debug("file progress: " + progress);
+                    } else {
+                        log.debug("file progress: " + progress + " / " + total + "，total：" + total + ", progress：" + progress);
+                    }
+                }
+
+                @Override
+                public void operationComplete(ChannelProgressiveFuture future) throws Exception {
+                    log.debug("file progress complete.");
+                    randomAccessFile.close();
+                }
+            });
+
+            ChannelFuture lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
+            if (!HttpHeaderUtil.isKeepAlive(request)) {
+                lastContentFuture.addListener(ChannelFutureListener.CLOSE);
+            }
+
         } catch (FileNotFoundException e) {
             log.debug("文件不存在!", e);
             sendError(ctx, NOT_FOUND);
         }
 
+    }
+
+    private void setContentTypeHeader(HttpResponse response, File file) {
+        MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
+        response.headers().set(HttpHeaderNames.CONTENT_TYPE, mimeTypesMap.getContentType(file.getPath()));
     }
 
     private byte[] fileToByte(File file) {

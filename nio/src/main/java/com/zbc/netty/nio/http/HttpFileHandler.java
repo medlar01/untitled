@@ -15,7 +15,10 @@ import java.io.RandomAccessFile;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -37,7 +40,7 @@ public class HttpFileHandler extends SimpleChannelInboundHandler<FullHttpRequest
 
     @Override
     protected void messageReceived(ChannelHandlerContext ctx, FullHttpRequest msg) throws Exception {
-        String uri = msg.uri();
+        String uri = URLDecoder.decode(msg.uri(), "utf-8");
         log.debug("请求到达: " + uri);
         if (!msg.decoderResult().isSuccess()) {
             sendError(ctx, BAD_REQUEST);
@@ -48,7 +51,7 @@ public class HttpFileHandler extends SimpleChannelInboundHandler<FullHttpRequest
             return;
         }
 
-        String obsPath = BASE_URL.concat(URLDecoder.decode(uri, "utf-8"));
+        String obsPath = BASE_URL.concat(uri);
         File file = new File(obsPath);
         if (file.isDirectory()) {
             sendDir(ctx, uri, Objects.requireNonNull(file.list()));
@@ -110,21 +113,24 @@ public class HttpFileHandler extends SimpleChannelInboundHandler<FullHttpRequest
     }
 
     private void sendDir(ChannelHandlerContext ctx, String uri, String[] list) {
-        StringBuilder html = new StringBuilder();
+        StringBuilder html = new StringBuilder("<!DOCTYPE HTML><html><head><style>body{font-size: 15px; font-family: courier New} a{text-decoration:none}</style></head><body>");
         if (!uri.equals("/")) {
             int i = uri.lastIndexOf("/");
             i = i == 0 ? 1 : i;
-            html.append("<a href='").append(uri.substring(0, i)).append("'>返回</a><br/>");
+            html.append("<a href='").append(uri, 0, i).append("'>返回..</a><br/>");
         } else {
             uri = "";
         }
         for (String child : list) {
+            File file = new File(BASE_URL.concat(uri), child);
+            if (file.isHidden())
+                continue;
             html.append("|- <a href='").append(uri).append("/").append(child).append("'>").append(child).append("</a><br/>");
         }
-
+        html.append("</body></html>");
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK, Unpooled.copiedBuffer(html.toString(), StandardCharsets.UTF_8));
         response.headers()
-                .set(CONTENT_TYPE, "text/html; charset=UTF-8");
+                .set(CONTENT_TYPE, "text/html; charset=utf-8");
         ctx.writeAndFlush(response)
                 .addListener(ChannelFutureListener.CLOSE);
     }
@@ -133,7 +139,7 @@ public class HttpFileHandler extends SimpleChannelInboundHandler<FullHttpRequest
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, hrs,
                 Unpooled.copiedBuffer("Failure: " + hrs.toString(), StandardCharsets.UTF_8));
         response.headers()
-                .set(CONTENT_TYPE, "text/plain; charset=UTF-8");
+                .set(CONTENT_TYPE, "text/plain; charset=utf-8");
         ctx.writeAndFlush(response)
                 .addListener(ChannelFutureListener.CLOSE);
     }

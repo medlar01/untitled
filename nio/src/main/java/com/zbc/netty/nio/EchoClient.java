@@ -46,7 +46,7 @@ public class EchoClient {
                             ch.pipeline().addLast(new StringDecoder());
 //                            ch.pipeline().addLast(new EchoClientHandler());
 //                            ch.pipeline().addLast(new EchoClientLineSymbolHandler());
-                            ch.pipeline().addLast(new EchoClientFixedLenghtHandler());
+                            ch.pipeline().addLast(new EchoClientFixedLengthHandler());
                         }
                     });
             b.connect().sync()

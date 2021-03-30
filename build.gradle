@@ -29,6 +29,7 @@ ext {
             'protobuf-java'           : 'com.google.protobuf:protobuf-java:3.7.1',
             'jboss-marshalling'       : 'org.jboss.marshalling:jboss-marshalling:2.0.11.Final',
             'jboss-marshalling-serial': 'org.jboss.marshalling:jboss-marshalling-serial:2.0.11.Final',
-            'activation'              : 'javax.activation:activation:1.1'
+            'activation'              : 'javax.activation:activation:1.1',
+            'jaxb-impl'               : 'com.sun.xml.bind:jaxb-impl:3.0.0'
     ]
 }

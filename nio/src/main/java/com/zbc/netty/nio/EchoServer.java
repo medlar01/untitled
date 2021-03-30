@@ -47,7 +47,7 @@ public class EchoServer {
                             ch.pipeline().addLast(new StringDecoder());
 //                            ch.pipeline().addLast(new EchoServerHandler());
 //                            ch.pipeline().addLast(new EchoServerLineSymbolHandler());
-                            ch.pipeline().addLast(new EchoServerFixedLenghtHandler());
+                            ch.pipeline().addLast(new EchoServerFixedLengthHandler());
                         }
                     });
             b.bind().sync()

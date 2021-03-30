@@ -34,12 +34,12 @@ import static io.netty.handler.codec.http.HttpResponseStatus.*;
  * @version 1.0
  * @since jdk8+
  */
-public class HttpFileHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+public class HttpFileHandler extends SimpleChannelInboundHandler<HttpRequest> {
     private final static Logger log = LoggerFactory.getLogger(HttpFileHandler.class);
     private final static String BASE_URL = "E:";
 
     @Override
-    protected void messageReceived(ChannelHandlerContext ctx, FullHttpRequest msg) throws Exception {
+    protected void messageReceived(ChannelHandlerContext ctx, HttpRequest msg) throws Exception {
         String uri = URLDecoder.decode(msg.uri(), "utf-8");
         log.debug("请求到达: " + uri);
         if (!msg.decoderResult().isSuccess()) {
@@ -64,7 +64,7 @@ public class HttpFileHandler extends SimpleChannelInboundHandler<FullHttpRequest
         sendError(ctx, BAD_REQUEST);
     }
 
-    private void sendFile(ChannelHandlerContext ctx, FullHttpRequest request, File file) throws IOException, ParseException {
+    private void sendFile(ChannelHandlerContext ctx, HttpRequest request, File file) throws IOException, ParseException {
         try {
             RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r");
             long fileLength = randomAccessFile.length();

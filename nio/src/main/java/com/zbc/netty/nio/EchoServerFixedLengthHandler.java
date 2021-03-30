@@ -18,9 +18,9 @@ import java.nio.charset.StandardCharsets;
  * @since jdk8+
  */
 @ChannelHandler.Sharable
-public class EchoServerFixedLenghtHandler extends ChannelHandlerAdapter {
+public class EchoServerFixedLengthHandler extends ChannelHandlerAdapter {
 
-    private final Logger log = LoggerFactory.getLogger(EchoServerFixedLenghtHandler.class);
+    private final Logger log = LoggerFactory.getLogger(EchoServerFixedLengthHandler.class);
     private String msg;
     private int count = 1;
 

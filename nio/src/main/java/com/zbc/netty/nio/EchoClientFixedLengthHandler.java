@@ -21,9 +21,9 @@ import java.util.Scanner;
  * @since jdk8+
  */
 @ChannelHandler.Sharable
-public class EchoClientFixedLenghtHandler extends ChannelHandlerAdapter {
+public class EchoClientFixedLengthHandler extends ChannelHandlerAdapter {
 
-    private final Logger log = LoggerFactory.getLogger(EchoClientFixedLenghtHandler.class);
+    private final Logger log = LoggerFactory.getLogger(EchoClientFixedLengthHandler.class);
     private Thread td;
 
     @Override

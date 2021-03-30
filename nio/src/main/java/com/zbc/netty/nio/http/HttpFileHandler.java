@@ -8,7 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.activation.MimetypesFileTypeMap;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.Objects;
@@ -29,13 +33,12 @@ import static io.netty.handler.codec.http.HttpResponseStatus.*;
  */
 public class HttpFileHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     private final static Logger log = LoggerFactory.getLogger(HttpFileHandler.class);
-    private final static String BASE_URL = "E:/";
+    private final static String BASE_URL = "E:";
 
     @Override
     protected void messageReceived(ChannelHandlerContext ctx, FullHttpRequest msg) throws Exception {
         String uri = msg.uri();
         log.debug("请求到达: " + uri);
-
         if (!msg.decoderResult().isSuccess()) {
             sendError(ctx, BAD_REQUEST);
             return;
@@ -45,7 +48,7 @@ public class HttpFileHandler extends SimpleChannelInboundHandler<FullHttpRequest
             return;
         }
 
-        String obsPath = BASE_URL.concat(uri);
+        String obsPath = BASE_URL.concat(URLDecoder.decode(uri, "utf-8"));
         File file = new File(obsPath);
         if (file.isDirectory()) {
             sendDir(ctx, uri, Objects.requireNonNull(file.list()));
@@ -78,7 +81,7 @@ public class HttpFileHandler extends SimpleChannelInboundHandler<FullHttpRequest
                     if (total < 0) {
                         log.debug("file progress: " + progress);
                     } else {
-                        log.debug("file progress: " + progress + " / " + total + "，total：" + total + ", progress：" + progress);
+                        log.debug("file progress: " + progress + " / " + total + ", total：" + total + ", progress：" + progress);
                     }
                 }
 
@@ -106,25 +109,6 @@ public class HttpFileHandler extends SimpleChannelInboundHandler<FullHttpRequest
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, mimeTypesMap.getContentType(file.getPath()));
     }
 
-    private byte[] fileToByte(File file) {
-        try {
-            FileInputStream fis = new FileInputStream(file);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            byte[] buf = new byte[1024];
-            int size;
-            while ((size = fis.read(buf)) != -1) {
-                bos.write(buf, 0, size);
-            }
-            fis.close();
-            bos.close();
-
-            return bos.toByteArray();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new byte[0];
-        }
-    }
-
     private void sendDir(ChannelHandlerContext ctx, String uri, String[] list) {
         StringBuilder html = new StringBuilder();
         if (!uri.equals("/")) {
@@ -135,7 +119,7 @@ public class HttpFileHandler extends SimpleChannelInboundHandler<FullHttpRequest
             uri = "";
         }
         for (String child : list) {
-            html.append("\t|- <a href='").append(uri).append("/").append(child).append("'>").append(child).append("</a><br/>");
+            html.append("|- <a href='").append(uri).append("/").append(child).append("'>").append(child).append("</a><br/>");
         }
 
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK, Unpooled.copiedBuffer(html.toString(), StandardCharsets.UTF_8));

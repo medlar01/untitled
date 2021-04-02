@@ -30,6 +30,7 @@ ext {
             'jboss-marshalling'       : 'org.jboss.marshalling:jboss-marshalling:2.0.11.Final',
             'jboss-marshalling-serial': 'org.jboss.marshalling:jboss-marshalling-serial:2.0.11.Final',
             'activation'              : 'javax.activation:activation:1.1',
-            'jaxb-impl'               : 'com.sun.xml.bind:jaxb-impl:3.0.0'
+            'jaxb-impl'               : 'com.sun.xml.bind:jaxb-impl:3.0.0',
+            'freemarker'              : 'org.freemarker:freemarker:2.3.31'
     ]
 }

@@ -1,5 +1,7 @@
 package com.zbc.netty.nio.http;
 
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.handler.codec.http.*;
@@ -8,17 +10,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.activation.MimetypesFileTypeMap;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_TYPE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -112,12 +108,16 @@ public class HttpFileHandler extends SimpleChannelInboundHandler<HttpRequest> {
         response.headers().set(HttpHeaderNames.CONTENT_TYPE, mimeTypesMap.getContentType(file.getPath()));
     }
 
-    private void sendDir(ChannelHandlerContext ctx, String uri, String[] list) {
-        StringBuilder html = new StringBuilder("<!DOCTYPE HTML><html><head><style>body{font-size: 15px; font-family: courier New} a{text-decoration:none}</style></head><body>");
+    private void sendDir(ChannelHandlerContext ctx, String uri, String[] list) throws IOException, TemplateException {
+        ArrayList<Map<String, String>> objList = new ArrayList<>();
+
         if (!uri.equals("/")) {
             int i = uri.lastIndexOf("/");
             i = i == 0 ? 1 : i;
-            html.append("<a href='").append(uri, 0, i).append("'>返回..</a><br/>");
+            Map<String, String> map = new HashMap<>();
+            map.put("href", uri.substring(0, i));
+            map.put("name", "..");
+            objList.add(map);
         } else {
             uri = "";
         }
@@ -125,10 +125,21 @@ public class HttpFileHandler extends SimpleChannelInboundHandler<HttpRequest> {
             File file = new File(BASE_URL.concat(uri), child);
             if (file.isHidden())
                 continue;
-            html.append("|- <a href='").append(uri).append("/").append(child).append("'>").append(child).append("</a><br/>");
+            Map<String, String> map = new HashMap<>();
+            map.put("href", new StringJoiner("/")
+                    .add(uri)
+                    .add(child)
+                    .toString()
+            );
+            map.put("name", child);
+            objList.add(map);
         }
-        html.append("</body></html>");
-        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK, Unpooled.copiedBuffer(html.toString(), StandardCharsets.UTF_8));
+        Template template = FreemarkerUtils.getTemplate("index.ftl");
+        Map<String, Object> map = new HashMap<>();
+        map.put("list", objList);
+        StringWriter writer = new StringWriter();
+        template.process(map, writer);
+        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, OK, Unpooled.copiedBuffer(writer.toString(), StandardCharsets.UTF_8));
         response.headers()
                 .set(CONTENT_TYPE, "text/html; charset=utf-8");
         ctx.writeAndFlush(response)

@@ -24,6 +24,7 @@ dependencies {
     implementation library['jboss-marshalling-serial']
     implementation library['activation']
     implementation library['jaxb-impl']
+    implementation library['freemarker']
 }
 
 protobuf {

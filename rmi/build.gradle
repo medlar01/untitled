@@ -1,0 +1,15 @@
+plugins {
+    id 'java'
+    id "com.google.protobuf" version "0.8.9"
+}
+
+def library = rootProject
+        .ext
+        .dependency
+
+group 'com.zbc.rmi'
+version '1.0'
+
+dependencies {
+
+}

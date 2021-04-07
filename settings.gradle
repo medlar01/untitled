@@ -2,4 +2,5 @@ rootProject.name = 'untitled'
 include 'bio'
 include 'nio'
 include 'aio'
+include 'rmi'
 

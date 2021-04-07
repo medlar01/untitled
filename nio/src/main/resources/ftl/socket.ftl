@@ -2,11 +2,20 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <style>
+        input, button, textarea {
+            border: 1px solid black;
+            border-radius: unset;
+            font-family: 'Courier New';
+            min-height: 18px;
+        }
+    </style>
 </head>
 <body>
 
 <input type="text" />
 <button onclick="send()">发送</button>
+<button onclick="_close()">断开</button>
 <br />
 <br />
 <textarea style="width: 500px; height: 300px"></textarea>
@@ -23,18 +32,14 @@
     }
     if (window.WebSocket) {
         sock = new WebSocket("ws://127.0.0.1:8080/websocket")
-        console.log("sock", sock)
         sock.onmessage = function (event) {
-            console.log("onmessage", event)
-            textarea.value = event.data
+            textarea.value += ('\r\n' + event.data)
         }
         sock.onopen = function (event) {
-            console.log("onopen", event)
             textarea.value = "已建立连接!";
         }
         sock.onclose = function (event) {
-            console.log("onclose", event)
-            textarea.value = "已关闭连接!";
+            textarea.value += "\r\n已关闭连接!";
         }
     }
     else {
@@ -46,11 +51,16 @@
 
         if (sock.readyState === WebSocket.OPEN) {
             const msg = input.value
-            console.log("send", msg)
             sock.send(msg)
         }
         else {
             alert("未建立连接!")
+        }
+    }
+
+    function _close() {
+        if (sock.readyState === WebSocket.OPEN) {
+            sock.close()
         }
     }
 </script>

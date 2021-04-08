@@ -1,6 +1,9 @@
-allprojects {
+subprojects {
     apply plugin: 'java'
     apply plugin: 'application'
+
+    targetCompatibility = 11
+    sourceCompatibility = 11
 
     repositories {
         mavenLocal()
@@ -11,8 +14,6 @@ allprojects {
 
 version '1.0'
 group 'com.zbc.netty'
-targetCompatibility = 11
-sourceCompatibility = 11
 
 
 ext {

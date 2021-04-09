@@ -1,5 +1,5 @@
 plugins {
-    id 'java'
+    id "java"
     id "com.google.protobuf" version "0.8.9"
 }
 
@@ -7,7 +7,7 @@ def library = rootProject
         .ext
         .dependency
 
-group 'com.zbc.netty'
+group 'com.zbc.protocol'
 version '1.0'
 
 dependencies {
@@ -15,17 +15,11 @@ dependencies {
     implementation library['slf4j-api']
     implementation library['logback-core']
     implementation library['logback-classic']
-    implementation library['msgpack']
-    implementation library['jackson-msgpack']
     implementation library['lombok']
     annotationProcessor library['lombok']
     implementation library['protobuf-java']
-    implementation library['jboss-marshalling']
-    implementation library['jboss-marshalling-serial']
-    implementation library['activation']
-    implementation library['jaxb-impl']
-    implementation library['freemarker']
 }
+
 
 protobuf {
     protoc {
@@ -43,7 +37,8 @@ sourceSets {
         proto {
 //            中文路径会乱码无法寻址，淦！
             srcDirs "proto"
+//            srcDirs 'E:/proto2'
+//            srcDirs 'E:/protobuf'
         }
     }
 }
-

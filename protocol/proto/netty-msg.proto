@@ -1,11 +1,11 @@
 syntax = "proto3";
 
 package com.zbc.protocol.msg;
-import "google/protobuf/any.proto";
-import "Header.proto";
+import "header.proto";
 
 option java_outer_classname = "NettyMsgSerializer";
+option java_multiple_files = true;
 message NettyMsg {
   com.zbc.protocol.msg.Header header = 1;
-  google.protobuf.Any body = 2;
+  bytes body = 2;
 }

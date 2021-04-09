@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package com.zbc.protocol.msg;
+import "google/protobuf/any.proto";
+
+option java_outer_classname = "HeaderSerializer";
+option java_multiple_files = true;
+message Header {
+  int32 crcCode = 1;
+  int32 length = 2;
+  int64 sessionId = 3;
+  int32 type = 4;
+  int32 priority = 5;
+  map<string, google.protobuf.Any> attachment = 6;
+}

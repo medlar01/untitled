@@ -1,8 +1,0 @@
-syntax = "proto3";
-
-package com.zbc.protocol.msg;
-
-option java_outer_classname = "HeaderSerializer";
-message Header {
-
-}

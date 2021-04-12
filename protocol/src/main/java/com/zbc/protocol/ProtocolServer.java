@@ -18,39 +18,30 @@ import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.net.ConnectException;
 import java.net.InetSocketAddress;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public class ProtocolServer {
+    private static final Logger log = LoggerFactory.getLogger(ProtocolServer.class);
+    private final ExecutorService executor = new ScheduledThreadPoolExecutor(2);
 
     public static void main(String[] args) throws Exception {
         int portNumber0 = Integer.parseInt(args[0]);
         int portNumber1 = Integer.parseInt(args[1]);
         ProtocolServer server = new ProtocolServer();
-        Thread td1 = new Thread(() -> {
-            try {
-                server.listen0(portNumber0);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        Thread td2 = new Thread(() -> {
-            try {
-                server.listen1(portNumber1);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-
-
-        td1.start();
-        td2.start();
-        td1.join();
-        td2.join();
+        CountDownLatch latch = new CountDownLatch(1);
+        server.start(() -> server.listen0(portNumber0));
+        server.start(() -> server.listen1(portNumber1));
+        latch.await();
     }
 
-    public void listen0(int portNumber) throws Exception {
+    public int listen0(int portNumber) throws Exception {
         EventLoopGroup parent = new NioEventLoopGroup();
         EventLoopGroup worker = new NioEventLoopGroup();
         try {
@@ -66,9 +57,7 @@ public class ProtocolServer {
                                     .addLast(new ProtobufVarint32LengthFieldPrepender())
                                     .addLast(new ProtobufDecoder(NettyMsg.getDefaultInstance()))
                                     .addLast(new ProtobufEncoder())
-                                    .addLast(new LoginAuthReqHandler())
                                     .addLast(new LoginAuthRespHandler())
-                                    .addLast(new HeartBeatReqHandler())
                                     .addLast(new HeartBeatRespHandler())
                             ;
                         }
@@ -83,11 +72,10 @@ public class ProtocolServer {
             worker.shutdownGracefully()
                     .sync();
         }
+        return -1;
     }
 
-    private int count = 10;
-
-    public void listen1(int portNumber) throws Exception {
+    public int listen1(int portNumber) throws Exception {
         EventLoopGroup worker = new NioEventLoopGroup();
 
         try {
@@ -104,9 +92,7 @@ public class ProtocolServer {
                                     .addLast(new ProtobufDecoder(NettyMsg.getDefaultInstance()))
                                     .addLast(new ProtobufEncoder())
                                     .addLast(new LoginAuthReqHandler())
-                                    .addLast(new LoginAuthRespHandler())
                                     .addLast(new HeartBeatReqHandler())
-                                    .addLast(new HeartBeatRespHandler())
                             ;
                         }
                     }).connect(new InetSocketAddress(portNumber))
@@ -117,12 +103,17 @@ public class ProtocolServer {
         } finally {
             worker.shutdownGracefully()
                     .sync();
-            if (0 < count --) {
+            // 断线重连
+            if (Thread.activeCount() > 1) {
                 Thread.sleep(5000);
+                log.error("server disconnect! try connect ...");
                 listen1(portNumber);
-            } else {
-                System.err.println(portNumber + " connect err!");
             }
         }
+        return -1;
+    }
+
+    private void start(Callable<?> callable) {
+        this.executor.submit(callable);
     }
 }

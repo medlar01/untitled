@@ -7,9 +7,11 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.concurrent.ScheduledFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 心跳请求处理
+ */
 public class HeartBeatReqHandler extends ChannelHandlerAdapter {
 
     private static final Logger log = LoggerFactory.getLogger(HeartBeatReqHandler.class);
@@ -27,7 +29,10 @@ public class HeartBeatReqHandler extends ChannelHandlerAdapter {
         }
         else
         if (nMsg.getHeader().getType() == HeaderTypeConstant.HEARTBEAT_RESP) {
-            log.debug("receive server heart beat message : " + nMsg.getBody());
+            String address = ctx.channel()
+                    .remoteAddress()
+                    .toString();
+            log.debug(address + " | receive server heart beat message : " + nMsg.getBody());
         }
         else ctx.fireChannelRead(msg);
     }
@@ -46,7 +51,7 @@ public class HeartBeatReqHandler extends ChannelHandlerAdapter {
             NettyMsg msg = NettyMsg.newBuilder()
                     .setHeader(header)
                     .build();
-            log.debug("send heart beat message to server : " + msg);
+            log.debug("client send heart beat message to server : " + msg);
             ctx.writeAndFlush(msg);
         }
     }

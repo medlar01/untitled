@@ -7,7 +7,9 @@ import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+/**
+ * 认证请求处理
+ */
 public class LoginAuthReqHandler extends ChannelHandlerAdapter {
 
     private static final Logger log = LoggerFactory.getLogger(LoginAuthReqHandler.class);
@@ -29,7 +31,10 @@ public class LoginAuthReqHandler extends ChannelHandlerAdapter {
         if (nMsg.hasHeader() && nMsg.getHeader().getType() == HeaderTypeConstant.LOGIN_AUTH_RESP) {
             if (nMsg.getBody().isEmpty()) ctx.close();
             else {
-                log.debug("Login is ok: " + nMsg.getBody());
+                String address = ctx.channel()
+                        .remoteAddress()
+                        .toString();
+                log.debug(address + " | Login is ok: " + nMsg.getBody());
                 ctx.fireChannelRead(msg);
             }
         } else ctx.fireChannelRead(msg);

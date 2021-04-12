@@ -7,6 +7,9 @@ import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 心跳响应处理
+ */
 public class HeartBeatRespHandler extends ChannelHandlerAdapter {
 
     private static final Logger log = LoggerFactory.getLogger(HeartBeatRespHandler.class);
@@ -15,7 +18,10 @@ public class HeartBeatRespHandler extends ChannelHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         NettyMsg nMsg = (NettyMsg) msg;
         if (nMsg.hasHeader() && nMsg.getHeader().getType() == HeaderTypeConstant.HEARTBEAT_REQ) {
-            log.debug("receive heart beat message : " + nMsg);
+            String address = ctx.channel()
+                    .remoteAddress()
+                    .toString();
+            log.debug(address + " | receive heart beat message : " + nMsg);
             Header header = Header.newBuilder()
                     .setType(HeaderTypeConstant.HEARTBEAT_RESP)
                     .build();

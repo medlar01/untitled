@@ -7,11 +7,16 @@
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss} | %-5level | [%t] %class:%line - %m%n</pattern>
         </encoder>
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+        <!--<filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>debug</level>
+            &lt;!&ndash;
+                ACCEPT  : 日志会被立即处理
+                DENY    : 日志将立即被抛弃不再经过其他过滤器
+                NEUTRAL :有序列表里的下个过滤器过接着处理日志
+            &ndash;&gt;
             <onMatch>ACCEPT</onMatch>
             <onMismatch>DENY</onMismatch>
-        </filter>
+        </filter>-->
     </appender>
 
 

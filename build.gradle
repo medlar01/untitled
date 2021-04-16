@@ -33,6 +33,8 @@ ext {
             'activation'              : 'javax.activation:activation:1.1',
             'jaxb-impl'               : 'com.sun.xml.bind:jaxb-impl:3.0.0',
             'freemarker'              : 'org.freemarker:freemarker:2.3.31',
-            'curator-framework'       : 'org.apache.curator:curator-framework:5.1.0'
+            'curator-framework'       : 'org.apache.curator:curator-framework:5.1.0',
+            'curator-recipes'         : 'org.apache.curator:curator-recipes:5.1.0'
+
     ]
 }

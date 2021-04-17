@@ -24,14 +24,13 @@ public class LockMain {
         ) {
             client.start();
             List<Thread> list = new ArrayList<>();
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 1000; i++) {
                 Thread td = new Thread(() -> {
                     try {
                         Lock lock = new ZkLock(client, "/lock/main");
                         lock.lock();
-                        Format formatter = new SimpleDateFormat("yyyy-MM-dd-HH-mm:ss");
+                        Format formatter = new SimpleDateFormat("yyyyMMddHHmm");
                         System.out.println(Thread.currentThread() + ": order no: " + formatter.format(new Date()) + "-" + (count++));
-                        Thread.sleep(1000L);
                         lock.unlock();
                     } catch (Exception e) {
                         e.printStackTrace();

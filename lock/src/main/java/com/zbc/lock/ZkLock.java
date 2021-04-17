@@ -3,56 +3,78 @@ package com.zbc.lock;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.CuratorCache;
 import org.apache.curator.framework.recipes.cache.CuratorCacheListener;
+import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.data.Stat;
 
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
-
-import static org.apache.curator.framework.recipes.cache.CuratorCacheListener.Type.NODE_DELETED;
 
 
 public class ZkLock implements Lock {
     private final String path;
     private final CuratorFramework client;
     private CountDownLatch cdl;
-    private final CuratorCache cache;
+    private CuratorCache cache;
+    private boolean tryLock = true;
+    private String currentPath;
+    private String beforePath;
 
     public ZkLock(CuratorFramework client, String path) throws Exception {
         this.path = path;
         this.client = client;
-        this.cache = CuratorCache.build(client, path);
-        this.cache.start();
+        try {
+            client.create()
+                    .creatingParentContainersIfNeeded()
+                    .forPath(path);
+        } catch (KeeperException.NodeExistsException ignore) {}
     }
 
     @Override
     public void lock() {
+        tryLock = false;
         boolean isLock = tryLock();
         if (!isLock) {
-            try {
-                listen();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            await();
             lock();
         }
     }
 
-    private void listen() throws InterruptedException {
-        CuratorCacheListener listener = (t, o, n) -> {
-            if (t == NODE_DELETED) {
-                System.out.println(Thread.currentThread() + " --------------。>>> CuratorCache: " + t);
-                cdl.countDown();
+    private void await() {
+        if (cache == null) {
+            cache = CuratorCache.build(client, beforePath);
+            cache.listenable()
+                    .addListener((t, o, n) -> {
+                        if (t == CuratorCacheListener.Type.NODE_DELETED) {
+                            if (cdl != null) {
+//                                System.out.println("addListener ---------------。>>> " + new Date() + "_" + beforePath);
+                                cdl.countDown();
+                            }
+                        }
+                    })
+            ;
+            cache.start();
+        }
+        try {
+            Stat stat = client.checkExists()
+                    .forPath(beforePath);
+//            System.out.println("checkExists ---------------。>>> " + new Date() + "_" + beforePath);
+            if (stat == null) {
+                return;
             }
-        };
-        cache.listenable().addListener(listener);
-        cdl.await();
-        cache.listenable().removeListener(listener);
+            cdl = new CountDownLatch(1);
+            cdl.await();
+            cache.close();
+            cache = null;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
@@ -62,48 +84,41 @@ public class ZkLock implements Lock {
 
     @Override
     public boolean tryLock() {
-        this.cdl = new CountDownLatch(1);
         try {
-            Stat stat = client.checkExists()
-                    .forPath(path);
-            if (stat == null) {
-                client.create()
-                        .creatingParentsIfNeeded()
-                        .forPath(path);
+            if (this.currentPath == null) {
+                this.currentPath = client.create()
+                        .creatingParentContainersIfNeeded()
+                        // 创建一个有序的节点
+                        .withMode(CreateMode.EPHEMERAL_SEQUENTIAL)
+                        .forPath(this.path + "/node_");
+            }
+
+            List<String> children = client.getChildren()
+                    .forPath(this.path);
+            Collections.sort(children);
+            int search = Collections.binarySearch(children, this.currentPath.substring(this.path.length() + 1));
+            if (search == 0) {
                 return true;
+            }
+
+            if (tryLock) {
+                client.delete()
+                        .deletingChildrenIfNeeded()
+                        .forPath(path);
+            } else {
+                this.beforePath = this.path + "/" + children.get(search - 1);
             }
         } catch (KeeperException.NodeExistsException ignore) {
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
-        System.out.println(Thread.currentThread() + ":NodeExistsException ----------------。>>>");
         return false;
     }
 
     @Override
     public boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
-        boolean isLock = tryLock();
-        if (!isLock) {
-            try {
-//            this.cache = new PathChildrenCache(client, path, false);
-//            this.cache.getListenable().addListener((client, event) -> {
-//                if (event.getType() == CHILD_REMOVED) {
-//                    this.cdl.countDown();
-//                }
-//            });
-//            this.cache.start();
-                if (!this.cdl.await(time, unit)) {
-                    return false;
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            isLock = tryLock(time, unit);
-        }
-        return isLock;
+        return false;
     }
 
     @Override
@@ -111,7 +126,8 @@ public class ZkLock implements Lock {
         try {
             client.delete()
                     .deletingChildrenIfNeeded()
-                    .forPath(path);
+                    .forPath(currentPath);
+//            System.out.println("unlock ---------------。>>> " + new Date() + "_" + currentPath);
         } catch (Exception e) {
             e.printStackTrace();
         }

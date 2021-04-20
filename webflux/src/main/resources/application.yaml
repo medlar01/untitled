@@ -1,0 +1,9 @@
+server:
+  port: 8080
+logging:
+  config: classpath:log4j2.xml
+  level:
+    root: error
+    com.bingco.webflux: debug
+    io.netty.util.internal: error
+    org.springframework.boot: info

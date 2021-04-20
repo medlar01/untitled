@@ -1,0 +1,17 @@
+plugins {
+    id "java"
+}
+
+def library = rootProject
+        .ext
+        .dependency
+
+group 'com.bingco.webflux'
+version '1.0'
+
+dependencies {
+    implementation(library['spring-boot-starter-webflux']) {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+        implementation library['spring-boot-starter-log4j2']
+    }
+}

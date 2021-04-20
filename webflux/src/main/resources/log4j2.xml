@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="DEBUG">
+    <Appenders>
+        <!--添加一个控制台追加器-->
+        <Console name="Console" target="SYSTEM_OUT" follow="true">
+            <PatternLayout>
+                <pattern>[%-5p] %d %c - %m%n</pattern>
+            </PatternLayout>
+        </Console>
+        <!--添加一个文本追加器，文件位于根目录下，名为log.log-->
+        <File name="File" fileName="logs/basic.log">
+            <PatternLayout>
+                <pattern>[%-5p] %d %c - %m%n</pattern>
+            </PatternLayout>
+        </File>
+    </Appenders>
+    <Loggers>
+        <Root level="DEBUG">
+            <AppenderRef ref="Console"/>
+        </Root>
+        　　　　<!--把org.springframework包下的所有日志输出到log文件，additivity="false"表示不输出到控制台-->
+        <Logger name="org.springframework" level="DEBUG" additivity="true">
+            <AppenderRef ref="File"/>
+        </Logger>
+
+        <logger name="com.rookie.basic.infrastructure.mapper" level="DEBUG" additivity="false">
+            <appender-ref ref="Console"/>
+        </logger>
+    </Loggers>
+</Configuration>

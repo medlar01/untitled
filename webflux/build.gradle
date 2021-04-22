@@ -12,6 +12,19 @@ version '1.0'
 dependencies {
     implementation(library['spring-boot-starter-webflux']) {
         exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
-        implementation library['spring-boot-starter-log4j2']
     }
+    implementation(library['mybatis-plus-boot-starter']) {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+        exclude group: 'org.springframework', module: 'spring-jdbc'
+    }
+    implementation(library['pagehelper-spring-boot-starter']) {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
+    implementation library['spring-boot-starter-log4j2']
+    implementation library['mysql-connector-java']
+    implementation library['spring-jdbc']
+    implementation library['mapstruct-jdk8']
+    annotationProcessor library['mapstruct-processor']
+    implementation library['lombok']
+    annotationProcessor library['lombok']
 }

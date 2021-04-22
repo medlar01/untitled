@@ -98,6 +98,7 @@ public class ZkLock implements Lock {
             Collections.sort(children);
             int search = Collections.binarySearch(children, this.currentPath.substring(this.path.length() + 1));
             if (search == 0) {
+                System.out.println("-------------。>>> is first " + Thread.currentThread());
                 return true;
             }
 

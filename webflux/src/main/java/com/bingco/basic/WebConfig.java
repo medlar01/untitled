@@ -1,4 +1,4 @@
-package com.bingco.webflux;
+package com.bingco.basic;
 
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.web.reactive.config.EnableWebFlux;

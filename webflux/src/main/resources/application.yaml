@@ -1,5 +1,37 @@
 server:
   port: 8080
+
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://192.168.16.178:3306/ams-basic?characterEncoding=utf8
+    username: root
+    password: root
+    hikari:
+      minimum-idle: 1
+      maximum-pool-size: 10
+      pool-name: HikariCP
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      connection-test-query: select 1
+
+mybatis-plus:
+  type-aliases-package: com.bingco.webflux.entity
+  mapper-locations: classpath*:/mapper/**/*.xml
+  configuration:
+    call-setters-on-nulls: true
+    map-underscore-to-camel-case: true
+    object-wrapper-factory: com.baomidou.mybatisplus.extension.MybatisMapWrapperFactory
+
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  page-size-zero: true
+  params: count=countSql
+
+
 logging:
   config: classpath:log4j2.xml
   level:

@@ -30,7 +30,7 @@ public class LockMain {
                         Lock lock = new ZkLock(client, "/lock/main");
                         lock.lock();
                         Format formatter = new SimpleDateFormat("yyyyMMddHHmm");
-                        System.out.println(Thread.currentThread() + ": order no: " + formatter.format(new Date()) + "-" + (count++));
+                        System.out.println(Thread.currentThread() + " order no: " + formatter.format(new Date()) + "-" + (count++));
                         lock.unlock();
                     } catch (Exception e) {
                         e.printStackTrace();

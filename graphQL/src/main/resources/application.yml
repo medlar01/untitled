@@ -1,0 +1,10 @@
+server:
+  port: 8080
+graphql:
+  servlet:
+    mapping: /graphql
+    corsEnabled: false
+    enabled: true
+#    playground:
+#      cdn:
+#        enabled: true

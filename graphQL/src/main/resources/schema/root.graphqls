@@ -1,0 +1,24 @@
+schema {
+    query: Query
+}
+
+type Query {
+    getPostById(id:Int) : Post
+    getUserById(id:Int) : User
+}
+
+type Post {
+    postId : ID!
+    title : String!
+    text : String
+    category: String
+    user: User
+}
+
+type User {
+    userId : ID!,
+    userName : String
+    realName : String
+    email : String
+    posts : [Post]
+}

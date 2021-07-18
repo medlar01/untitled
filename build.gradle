@@ -42,6 +42,7 @@ ext {
             'spring-jdbc'                   : 'org.springframework:spring-jdbc:5.3.4',
             'pagehelper-spring-boot-starter': 'com.github.pagehelper:pagehelper-spring-boot-starter:1.3.0',
             'mapstruct-jdk8'                : 'org.mapstruct:mapstruct-jdk8:1.4.2.Final',
-            'mapstruct-processor'           : 'org.mapstruct:mapstruct-processor:1.3.1.Final'
+            'mapstruct-processor'           : 'org.mapstruct:mapstruct-processor:1.3.1.Final',
+            'jol-core'                      : 'org.openjdk.jol:jol-core:0.16'
     ]
 }

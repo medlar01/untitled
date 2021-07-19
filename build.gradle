@@ -46,6 +46,7 @@ ext {
             'spring-boot-starter-web'                   : 'org.springframework.boot:spring-boot-starter-web:2.3.1.RELEASE',
             'graphql-spring-boot-starter'               : 'com.graphql-java:graphql-spring-boot-starter:5.0.2',
             'graphql-java-spring-boot-starter-webmvc'   : 'com.graphql-java:graphql-java-spring-boot-starter-webmvc:2.0',
-            'graphql-java-tools'                        : 'com.graphql-java:graphql-java-tools:5.2.4'
+            'graphql-java-tools'                        : 'com.graphql-java:graphql-java-tools:5.2.4',
+            'jol-core'                                  : 'org.openjdk.jol:jol-core:0.16'
     ]
 }

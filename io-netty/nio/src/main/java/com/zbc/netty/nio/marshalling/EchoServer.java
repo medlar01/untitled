@@ -1,4 +1,4 @@
-package com.zbc.netty.nio;
+package com.zbc.netty.nio.marshalling;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
@@ -7,16 +7,15 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.FixedLengthFrameDecoder;
-import io.netty.handler.codec.LineBasedFrameDecoder;
-import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 
 import java.net.InetSocketAddress;
 
 /**
- * <h3>
+ * <H3>  </H3>
  * <p>
- * create: 2020/9/25 <br/>
+ * create: 2021/3/23 <br/>
  * email: bingco.zn@gmail.com <br/>
  *
  * @author zhan_bingcong
@@ -27,35 +26,36 @@ public class EchoServer {
 
     public static void main(String[] args) throws Exception {
         int portNumber = 8080;
-        new EchoServer().start(portNumber);
+        new EchoServer().listen(portNumber);
     }
 
-
-    public void start(int portNumber) throws Exception {
+    private void listen(int portNumber) throws Exception {
         EventLoopGroup group = new NioEventLoopGroup();
+        EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
-            ServerBootstrap b = new ServerBootstrap();
-            b.group(group)
+            ServerBootstrap sbp = new ServerBootstrap();
+            sbp.group(group, workerGroup)
                     .channel(NioServerSocketChannel.class)
+                    .option(ChannelOption.SO_BACKLOG, 100)
+                    .handler(new LoggingHandler(LogLevel.INFO))
                     .localAddress(new InetSocketAddress(portNumber))
-                    .option(ChannelOption.SO_BACKLOG, 1024)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
-//                            ch.pipeline().addLast(new LineBasedFrameDecoder(1024));
-                            ch.pipeline().addLast(new FixedLengthFrameDecoder(20));
-                            ch.pipeline().addLast(new StringDecoder());
-//                            ch.pipeline().addLast(new EchoServerHandler());
-//                            ch.pipeline().addLast(new EchoServerLineSymbolHandler());
-                            ch.pipeline().addLast(new EchoServerFixedLengthHandler());
+                            ch.pipeline().addLast(MarshallingCodeCFactory.buildMarshallingDecoder());
+                            ch.pipeline().addLast(MarshallingCodeCFactory.buildMarshallingEncoder());
+                            ch.pipeline().addLast(new ServerHandler());
                         }
-                    });
-            b.bind().sync()
+                    }).bind()
+                    .sync()
                     .channel()
                     .closeFuture()
                     .sync();
         } finally {
-            group.shutdownGracefully().sync();
+            group.shutdownGracefully()
+                    .sync();
+            workerGroup.shutdownGracefully()
+                    .sync();
         }
     }
 }

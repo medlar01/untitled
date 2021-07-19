@@ -7,4 +7,4 @@ include 'protocol'
 include 'lock'
 include 'webflux'
 include 'graphQL'
-
+include 'basic-java:synchronized'

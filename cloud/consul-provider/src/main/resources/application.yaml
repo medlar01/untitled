@@ -1,0 +1,14 @@
+server:
+  port: 9101
+graphql:
+  servlet:
+    mapping: /graphql
+    corsEnabled: false
+    enabled: true
+spring:
+  application:
+    name: consul-provider
+  cloud:
+    consul:
+      host: 127.0.0.1
+      port: 8500

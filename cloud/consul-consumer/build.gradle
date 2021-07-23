@@ -1,0 +1,29 @@
+plugins {
+    id "java"
+    id 'org.springframework.boot' version '2.3.12.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+}
+
+def library = rootProject
+        .ext
+        .dependency
+
+group 'com.xxx.consumer'
+version '1.0'
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:Hoxton.SR6"
+    }
+}
+
+dependencies {
+    implementation library['spring-boot-starter-web']
+    implementation library['graphql-spring-boot-starter']
+    implementation library['mapstruct-jdk8']
+    annotationProcessor library['mapstruct-processor']
+    implementation library['lombok']
+    annotationProcessor library['lombok']
+    implementation 'org.springframework.cloud:spring-cloud-starter-consul-discovery'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}

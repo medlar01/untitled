@@ -1,8 +1,8 @@
 package com.xxx.consumer.api;
 
+import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import com.xxx.consumer.pojo.User;
 import com.xxx.consumer.vary.UserMap;
-import graphql.kickstart.tools.GraphQLQueryResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -28,6 +28,7 @@ public class UserApi implements GraphQLQueryResolver {
         @SuppressWarnings("unchecked")
         HashMap<String, ?> map = responseEntity.getBody();
         System.out.println("请求结果: " + responseEntity.getStatusCode() + " , " + map);
+        assert map != null;
         @SuppressWarnings("unchecked")
         User user = UserMap.INST.mapToUser((Map<String, Serializable>)
                 ((Map<String, Serializable>) map.get("data")).get("findMyInfo"));

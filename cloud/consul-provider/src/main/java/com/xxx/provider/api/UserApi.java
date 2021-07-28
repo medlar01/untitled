@@ -1,7 +1,7 @@
 package com.xxx.provider.api;
 
+import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import com.xxx.provider.pojo.User;
-import graphql.kickstart.tools.GraphQLQueryResolver;
 import org.springframework.stereotype.Service;
 
 @Service

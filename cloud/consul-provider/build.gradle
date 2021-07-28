@@ -19,6 +19,7 @@ dependencyManagement {
 
 dependencies {
     implementation library['spring-boot-starter-web']
+    implementation library['graphql-java-tools']
     implementation library['graphql-spring-boot-starter']
     implementation library['lombok']
     annotationProcessor library['lombok']

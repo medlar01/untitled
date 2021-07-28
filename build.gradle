@@ -44,7 +44,7 @@ ext {
             'mapstruct-jdk8'                            : 'org.mapstruct:mapstruct-jdk8:1.4.2.Final',
             'mapstruct-processor'                       : 'org.mapstruct:mapstruct-processor:1.3.1.Final',
             'spring-boot-starter-web'                   : 'org.springframework.boot:spring-boot-starter-web:2.3.1.RELEASE',
-            'graphql-spring-boot-starter'               : 'com.graphql-java:graphql-spring-boot-starter:5.0.2',
+            'graphql-spring-boot-starter'               : 'com.graphql-java:graphql-spring-boot-starter:12.0.0',
             'graphql-java-spring-boot-starter-webmvc'   : 'com.graphql-java:graphql-java-spring-boot-starter-webmvc:2.0',
             'graphql-java-tools'                        : 'com.graphql-java:graphql-java-tools:5.2.4',
             'jol-core'                                  : 'org.openjdk.jol:jol-core:0.16'

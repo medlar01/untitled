@@ -1,0 +1,18 @@
+plugins {
+    id "java"
+}
+
+def library = rootProject
+        .ext
+        .dependency
+
+group 'com.bingco.asm'
+version '1.0'
+
+dependencies {
+    implementation library['asm']
+    implementation library['asm-commons']
+    implementation library['asm-util']
+    implementation library['asm-tree']
+    implementation library['asm-analysis']
+}

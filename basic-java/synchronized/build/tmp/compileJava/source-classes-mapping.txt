@@ -1,0 +1,3 @@
+com/bingco/SynchronizedMain.java
+ com.bingco.SynchronizedMain
+ com.bingco.SynchronizedMain$ExampleObj

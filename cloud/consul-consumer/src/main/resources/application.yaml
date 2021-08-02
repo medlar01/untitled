@@ -5,6 +5,8 @@ graphql:
     mapping: /graphql
     corsEnabled: false
     enabled: true
+  tools:
+    schema-location-pattern: "schema/*.graphqls"
 spring:
   application:
     name: consul-consumer

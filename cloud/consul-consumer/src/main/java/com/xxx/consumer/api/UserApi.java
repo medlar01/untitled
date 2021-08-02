@@ -1,8 +1,8 @@
 package com.xxx.consumer.api;
 
-import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import com.xxx.consumer.pojo.User;
 import com.xxx.consumer.vary.UserMap;
+import graphql.kickstart.tools.GraphQLQueryResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;

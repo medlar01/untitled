@@ -18,14 +18,21 @@ dependencies {
     implementation library['logback-classic']
     implementation library['msgpack']
     implementation library['jackson-msgpack']
+    implementation library['kryo']
     implementation library['lombok']
+    testImplementation library['lombok']
     annotationProcessor library['lombok']
+    testAnnotationProcessor library['lombok']
     implementation library['protobuf-java']
     implementation library['jboss-marshalling']
     implementation library['jboss-marshalling-serial']
     implementation library['activation']
     implementation library['jaxb-impl']
     implementation library['freemarker']
+    testImplementation library['junit']
+    testImplementation library['powermock-junit']
+    testImplementation library['mockito']
+    testImplementation library['powermock-mockito']
 }
 
 protobuf {

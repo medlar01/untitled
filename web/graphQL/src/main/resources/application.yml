@@ -7,6 +7,8 @@ graphql:
     mapping: /graphql
     corsEnabled: false
     enabled: true
+  tools:
+    schema-location-pattern: "schema/*.graphqls"
 #    playground:
 #      cdn:
 #        enabled: true

@@ -12,7 +12,6 @@ version '1.0'
 dependencies {
     implementation(library['spring-boot-starter-web'])
     implementation library['graphql-spring-boot-starter']
-    implementation library['graphiql-spring-boot-starter']
     implementation library['graphql-java-tools']
     implementation library['lombok']
     annotationProcessor library['lombok']

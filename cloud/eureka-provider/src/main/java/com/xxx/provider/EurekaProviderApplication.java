@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class EurekaProviderApplication {
     public static void main(String[] args) {
         SpringApplication.run(EurekaProviderApplication.class, args);
+        // TODO
+        // https://github.com/seata/seata-samples/blob/master/springcloud-eureka-seata/order/src/main/java/io/seata/sample/OrderApplication.java
     }
 
     @ResponseBody

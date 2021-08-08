@@ -56,6 +56,9 @@ ext {
             'asm-commons'                   : 'org.ow2.asm:asm-commons:9.1',
             'asm-util'                      : 'org.ow2.asm:asm-util:9.1',
             'asm-tree'                      : 'org.ow2.asm:asm-tree:9.1',
-            'asm-analysis'                  : 'org.ow2.asm:asm-analysis:9.1'
+            'asm-analysis'                  : 'org.ow2.asm:asm-analysis:9.1',
+
+            'spring-cloud-alibaba-seata'    : 'com.alibaba.cloud:spring-cloud-alibaba-seata:2.2.0.RELEASE',
+            'seata-all'                     : 'io.seata:seata-all:1.4.2'
     ]
 }

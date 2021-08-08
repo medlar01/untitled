@@ -7,3 +7,13 @@ eureka:
 spring:
   application:
     name: eureka-provider
+  cloud:
+    alibaba:
+      seata:
+        tx-service-group: seata-demo-group
+  main:
+    allow-bean-definition-overriding: true
+logging:
+  level:
+    org.springframework.cloud.alibaba.seata.web: debug
+    io.seata: debug

@@ -8,3 +8,22 @@ eureka:
 spring:
   application:
     name: eureka-consumer
+  cloud:
+    alibaba:
+      seata:
+        tx-service-group: seata-demo-group
+  main:
+    allow-bean-definition-overriding: true
+  datasource:
+    hikari:
+      driver-class-name: com.mysql.jdbc.Driver
+      jdbc-url: jdbc:mysql://192.168.16.178:3306/seata?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+      username: root
+      password: root
+      idle-timeout: 6000
+      minimum-idle: 2
+      maximum-pool-size: 10
+logging:
+  level:
+    org.springframework.cloud.alibaba.seata.web: debug
+    io.seata: debug

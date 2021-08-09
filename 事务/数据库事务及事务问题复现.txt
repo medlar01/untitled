@@ -1,0 +1,32 @@
+###事务级别
++--------------------------------------------------+
+|事务隔离级别	                脏读     不可重复读   幻读|
+|读未提交（read-uncommitted）	是	    是	        是 |
+|读已提交（read-committed）	否	    是	        是 |
+|可重复读（repeatable-read）	否	    否	        是 |
+|串行化（serializable）	    否	    否	        否 |
++--------------------------------------------------+
+设置事务级别（mysql）
+set session transaction isolation level read uncommitted; -- [read uncommitted|read committed|repeatable read|serializable]
+
+
+
+###幻读复现
+                                                    执行轴
+```事务1```                                           |    ```事务2```
+                                                     |
+begin;                                   -- step 1 --|
+select * from t_record where id = 7;     -- step 2 --|
+                                                     |-- step 3 --      begin;
+                                                     |-- step 4 --      insert into t_record(id, amount, `from`, `to`, remark) values(7, 10, 1, 2, '幻读复现');
+                                                     |-- step 5 --      commit;
+select * from t_record where id = 7;     -- step 6 --|
+commit;                                  -- step 7 --|
+                                                     |
+                                                     |
+                                                     |
+                                                     V
+
+       step 2 读取时id=7不存在
+       step 3~5新增了id 7
+       step 6 却读不到id 7

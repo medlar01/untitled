@@ -22,5 +22,9 @@ dependencies {
     implementation library['lombok']
     annotationProcessor library['lombok']
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    implementation library['spring-cloud-alibaba-seata']
+    implementation library['seata-all']
+    implementation library['spring-boot-starter-data-jpa']
+    implementation library['mysql-connector-java']
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

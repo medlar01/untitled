@@ -60,7 +60,6 @@ ext {
 
             'spring-boot-starter-data-jpa'  : 'org.springframework.boot:spring-boot-starter-data-jpa:2.5.2',
             'spring-cloud-alibaba-seata'    : 'com.alibaba.cloud:spring-cloud-alibaba-seata:2.2.0.RELEASE',
-            'seata-all'                     : 'io.seata:seata-all:1.4.2',
-            'mysql-connector-java'          : 'mysql:mysql-connector-java:5.1.47'
+//            'seata-all'                     : 'io.seata:seata-all:1.4.2',
     ]
 }

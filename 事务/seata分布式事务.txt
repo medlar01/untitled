@@ -1,0 +1,3 @@
+参考例子： eureka-provider 、 eureka-consumer
+
+当下游服务抛出异常，上游服务捕获下游异常，全局事务正常回滚

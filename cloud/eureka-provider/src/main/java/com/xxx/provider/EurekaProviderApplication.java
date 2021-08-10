@@ -1,26 +1,23 @@
 package com.xxx.provider;
 
-import com.zaxxer.hikari.HikariDataSource;
-import io.seata.rm.datasource.DataSourceProxy;
+import io.seata.spring.annotation.GlobalTransactional;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Objects;
+import java.util.Arrays;
 
+/**
+ * 下游服务
+ */
 @RequestMapping
 @SpringBootApplication
+@EnableJpaRepositories
 public class EurekaProviderApplication {
     private static ListableBeanFactory beanFactory;
 
@@ -37,41 +34,33 @@ public class EurekaProviderApplication {
 
     @ResponseBody
     @RequestMapping(method = RequestMethod.GET, value = "updateOrder")
+    @GlobalTransactional
     public String order(int fromUserId, int toUserId, double amount) throws SQLException {
-        JdbcTemplate jdbcTemplate = beanFactory.getBean("jdbcTemplate", JdbcTemplate.class);
-        Connection connection = Objects.requireNonNull(jdbcTemplate.getDataSource())
-                .getConnection();
-        try {
-            connection.setAutoCommit(false);
-            jdbcTemplate.update("update t_card set amount = amount - ? where user_id = ?", new Object[]{amount, fromUserId});
-            jdbcTemplate.update("update t_card set amount = amount + ? where user_id = ?", new Object[]{amount, toUserId});
-            int a = 1/0;
-            connection.commit();
-        } catch (Exception e) {
-            connection.rollback();
-            e.printStackTrace();
-            return "FAIL";
-        } finally {
-            connection.close();
-        }
+        CardDAO dao = beanFactory.getBean(CardDAO.class);
+        Card c1 = dao.findById(fromUserId)
+                .orElse(null);
+        assert c1 != null;
+        c1.setAmount(c1.getAmount() - amount);
+        Card c2 = dao.findById(toUserId)
+                .orElse(null);
+        assert c2 != null;
+        c2.setAmount(c2.getAmount() - amount);
+        // 测试上游正常下游 division by zero exception 时，全局事务发生回滚
+//        int a = 1 / 0;
+        dao.saveAll(Arrays.asList(c1, c2));
         return "OK";
     }
 
-    @Bean
-    @ConfigurationProperties(prefix = "spring.datasource.hikari")
-    public DataSource dataSource() {
-        return new HikariDataSource();
-    }
+//    @Bean
+//    @ConfigurationProperties(prefix = "spring.datasource.hikari")
+//    public DataSource dataSource() {
+//        return new HikariDataSource();
+//    }
+//
+//    @Primary
+//    @Bean("dataSourceProxy")
+//    public DataSourceProxy dataSourceProxy(DataSource dataSource) {
+//        return new DataSourceProxy(dataSource);
+//    }
 
-    @Primary
-    @Bean("dataSourceProxy")
-    public DataSourceProxy dataSourceProxy(DataSource dataSource) {
-        return new DataSourceProxy(dataSource);
-    }
-
-    @Bean("jdbcTemplate")
-    @ConditionalOnBean(DataSourceProxy.class)
-    public JdbcTemplate jdbcTemplate(DataSourceProxy dataSourceProxy) {
-        return new JdbcTemplate(dataSourceProxy);
-    }
 }

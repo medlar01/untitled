@@ -1,25 +1,23 @@
 package com.xxx.consumer;
 
-import com.zaxxer.hikari.HikariDataSource;
-import io.seata.rm.datasource.DataSourceProxy;
+import io.seata.spring.annotation.GlobalTransactional;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 
-import javax.sql.DataSource;
-
+/**
+ * 上游服务
+ */
 @RequestMapping
+@EnableJpaRepositories
 @SpringBootApplication
 public class EurekaConsumerApplication {
     private static ListableBeanFactory beanFactory;
@@ -44,30 +42,37 @@ public class EurekaConsumerApplication {
 
     @ResponseBody
     @RequestMapping(method = RequestMethod.GET, value = "/transfer")
+    @GlobalTransactional
     public String transfer(int fromUserId, int toUserId, double amount, String remark) {
-        JdbcTemplate jdbcTemplate = beanFactory.getBean("jdbcTemplate", JdbcTemplate.class);
-        jdbcTemplate.update("insert into t_record(amount, `from`, `to`, remark) values(?, ?, ?, ?)", new Object[]{ amount, fromUserId, toUserId, remark });
-        ResponseEntity<String> entity = restTemplate()
-                .getForEntity(String.format("http://eureka-provider/updateOrder?fromUserId=%s&toUserId=%s&amount=%s", fromUserId, toUserId, amount), String.class);
-        return entity.getBody();
+        Record record = new Record();
+        record.setFrom(fromUserId);
+        record.setTo(toUserId);
+        record.setAmount(amount);
+        record.setRemark(remark);
+        RecordDAO dao = beanFactory.getBean(RecordDAO.class);
+        dao.save(record);
+//        try {
+            ResponseEntity<String> entity = restTemplate()
+                    .getForEntity(String.format("http://eureka-provider/updateOrder?fromUserId=%s&toUserId=%s&amount=%s", fromUserId, toUserId, amount), String.class);
+            // 测试下游正常上游 division by zero exception 时，全局事务回滚
+            int a = 1 / 0;
+            return entity.getBody();
+//        } catch (Exception e) {
+//            return "FAIL";
+//        }
     }
 
 
-    @Bean
-    @ConfigurationProperties(prefix = "spring.datasource.hikari")
-    public DataSource dataSource() {
-        return new HikariDataSource();
-    }
+//    @Bean
+//    @ConfigurationProperties(prefix = "spring.datasource.hikari")
+//    public DataSource dataSource() {
+//        return new HikariDataSource();
+//    }
+//
+//    @Primary
+//    @Bean("dataSourceProxy")
+//    public DataSourceProxy dataSourceProxy(DataSource dataSource) {
+//        return new DataSourceProxy(dataSource);
+//    }
 
-    @Primary
-    @Bean("dataSourceProxy")
-    public DataSourceProxy dataSourceProxy(DataSource dataSource) {
-        return new DataSourceProxy(dataSource);
-    }
-
-    @Bean("jdbcTemplate")
-    @ConditionalOnBean(DataSourceProxy.class)
-    public JdbcTemplate jdbcTemplate(DataSourceProxy dataSourceProxy) {
-        return new JdbcTemplate(dataSourceProxy);
-    }
 }

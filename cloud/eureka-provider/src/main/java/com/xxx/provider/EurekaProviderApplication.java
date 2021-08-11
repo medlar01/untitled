@@ -32,10 +32,13 @@ public class EurekaProviderApplication {
         return "OK";
     }
 
+    /**
+     * seata AT模式示例：转账修改金额
+     */
     @ResponseBody
-    @RequestMapping(method = RequestMethod.GET, value = "updateOrder")
+    @RequestMapping(method = RequestMethod.GET, value = "at/updateOrder")
     @GlobalTransactional
-    public String order(int fromUserId, int toUserId, double amount) throws SQLException {
+    public String atOrder(int fromUserId, int toUserId, double amount) throws SQLException {
         CardDAO dao = beanFactory.getBean(CardDAO.class);
         Card c1 = dao.findById(fromUserId)
                 .orElse(null);
@@ -44,23 +47,18 @@ public class EurekaProviderApplication {
         Card c2 = dao.findById(toUserId)
                 .orElse(null);
         assert c2 != null;
-        c2.setAmount(c2.getAmount() - amount);
+        c2.setAmount(c2.getAmount() + amount);
         // 测试上游正常下游 division by zero exception 时，全局事务发生回滚
 //        int a = 1 / 0;
         dao.saveAll(Arrays.asList(c1, c2));
         return "OK";
     }
 
-//    @Bean
-//    @ConfigurationProperties(prefix = "spring.datasource.hikari")
-//    public DataSource dataSource() {
-//        return new HikariDataSource();
-//    }
-//
-//    @Primary
-//    @Bean("dataSourceProxy")
-//    public DataSourceProxy dataSourceProxy(DataSource dataSource) {
-//        return new DataSourceProxy(dataSource);
-//    }
-
+    @ResponseBody
+    @RequestMapping(method = RequestMethod.GET, value = "tcc/updateOrder")
+    @GlobalTransactional
+    public String tccOrder(int fromUserId, int toUserId, double amount) throws SQLException {
+        TccBusinessService service = beanFactory.getBean(TccBusinessService.class);
+        return service.business(null, fromUserId, toUserId, amount) ? "FAIL" : "OK";
+    }
 }

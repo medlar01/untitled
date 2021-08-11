@@ -10,10 +10,6 @@ spring:
     name: eureka-consumer
   jpa:
     show-sql: true
-  cloud:
-    alibaba:
-      seata:
-        tx-service-group: seata-demo-group
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://192.168.16.178:3306/seata?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
@@ -29,3 +25,6 @@ logging:
   level:
     org.springframework.cloud.alibaba.seata.web: debug
     io.seata: debug
+    com.xxx.consumer: debug
+seata:
+  tx-service-group: seata-demo-group

@@ -57,9 +57,8 @@ ext {
             'asm-util'                      : 'org.ow2.asm:asm-util:9.1',
             'asm-tree'                      : 'org.ow2.asm:asm-tree:9.1',
             'asm-analysis'                  : 'org.ow2.asm:asm-analysis:9.1',
-
             'spring-boot-starter-data-jpa'  : 'org.springframework.boot:spring-boot-starter-data-jpa:2.5.2',
-            'spring-cloud-alibaba-seata'    : 'com.alibaba.cloud:spring-cloud-alibaba-seata:2.2.0.RELEASE',
-//            'seata-all'                     : 'io.seata:seata-all:1.4.2',
+            'spring-cloud-alibaba-seata'    : 'com.alibaba.cloud:spring-cloud-starter-alibaba-seata:2.2.1.RELEASE',
+            'seata-spring-boot-starter': 'io.seata:seata-spring-boot-starter:1.4.1'
     ]
 }

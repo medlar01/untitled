@@ -40,10 +40,13 @@ public class EurekaConsumerApplication {
         return entity.getBody();
     }
 
+    /**
+     * seata AT模式示例：转账新增记录
+     */
     @ResponseBody
-    @RequestMapping(method = RequestMethod.GET, value = "/transfer")
+    @RequestMapping(method = RequestMethod.GET, value = "at/transfer")
     @GlobalTransactional
-    public String transfer(int fromUserId, int toUserId, double amount, String remark) {
+    public String atTransfer(int fromUserId, int toUserId, double amount, String remark) {
         Record record = new Record();
         record.setFrom(fromUserId);
         record.setTo(toUserId);
@@ -53,26 +56,20 @@ public class EurekaConsumerApplication {
         dao.save(record);
 //        try {
             ResponseEntity<String> entity = restTemplate()
-                    .getForEntity(String.format("http://eureka-provider/updateOrder?fromUserId=%s&toUserId=%s&amount=%s", fromUserId, toUserId, amount), String.class);
+                    .getForEntity(String.format("http://eureka-provider/at/updateOrder?fromUserId=%s&toUserId=%s&amount=%s", fromUserId, toUserId, amount), String.class);
             // 测试下游正常上游 division by zero exception 时，全局事务回滚
-            int a = 1 / 0;
+//            int a = 1 / 0;
             return entity.getBody();
 //        } catch (Exception e) {
 //            return "FAIL";
 //        }
     }
 
-
-//    @Bean
-//    @ConfigurationProperties(prefix = "spring.datasource.hikari")
-//    public DataSource dataSource() {
-//        return new HikariDataSource();
-//    }
-//
-//    @Primary
-//    @Bean("dataSourceProxy")
-//    public DataSourceProxy dataSourceProxy(DataSource dataSource) {
-//        return new DataSourceProxy(dataSource);
-//    }
-
+    @ResponseBody
+    @RequestMapping(method = RequestMethod.GET, value = "tcc/transfer")
+    @GlobalTransactional
+    public String tccTransfer(int fromUserId, int toUserId, double amount, String remark) {
+        TccBusinessService service = beanFactory.getBean(TccBusinessService.class);
+        return service.business(null, fromUserId, toUserId, amount, remark) ? "FAIL" : "OK";
+    }
 }

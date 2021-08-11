@@ -20,11 +20,10 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
   jpa:
     show-sql: true
-  cloud:
-    alibaba:
-      seata:
-        tx-service-group: seata-demo-group
 logging:
   level:
     org.springframework.cloud.alibaba.seata.web: debug
     io.seata: debug
+    com.xxx.provider: debug
+seata:
+  tx-service-group: seata-demo-group

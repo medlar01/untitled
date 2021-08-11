@@ -1,3 +1,7 @@
 参考例子： eureka-provider 、 eureka-consumer
 
 当下游服务抛出异常，上游服务捕获下游异常，全局事务正常回滚
+
+
+
+TCC模式下try、comfirm、cancel 必须要用接口定义，不能直接用具体类

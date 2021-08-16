@@ -1,5 +1,6 @@
 package com.xxx.provider;
 
+import io.seata.spring.annotation.GlobalLock;
 import io.seata.spring.annotation.GlobalTransactional;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.boot.SpringApplication;
@@ -54,11 +55,14 @@ public class EurekaProviderApplication {
         return "OK";
     }
 
+    /**
+     * seata TCC模式示例：转账修改金额
+     */
     @ResponseBody
     @RequestMapping(method = RequestMethod.GET, value = "tcc/updateOrder")
-    @GlobalTransactional
+    @GlobalLock // @GlobalTransactional
     public String tccOrder(int fromUserId, int toUserId, double amount) throws SQLException {
         TccBusinessService service = beanFactory.getBean(TccBusinessService.class);
-        return service.business(null, fromUserId, toUserId, amount) ? "FAIL" : "OK";
+        return service.business(null, fromUserId, toUserId, amount) ? "OK" : "FAIL";
     }
 }

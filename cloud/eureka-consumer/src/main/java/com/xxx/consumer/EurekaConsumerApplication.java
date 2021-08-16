@@ -1,5 +1,6 @@
 package com.xxx.consumer;
 
+import io.seata.spring.annotation.GlobalLock;
 import io.seata.spring.annotation.GlobalTransactional;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.boot.SpringApplication;
@@ -45,7 +46,7 @@ public class EurekaConsumerApplication {
      */
     @ResponseBody
     @RequestMapping(method = RequestMethod.GET, value = "at/transfer")
-    @GlobalTransactional
+    @GlobalLock // @GlobalTransactional
     public String atTransfer(int fromUserId, int toUserId, double amount, String remark) {
         Record record = new Record();
         record.setFrom(fromUserId);
@@ -70,6 +71,6 @@ public class EurekaConsumerApplication {
     @GlobalTransactional
     public String tccTransfer(int fromUserId, int toUserId, double amount, String remark) {
         TccBusinessService service = beanFactory.getBean(TccBusinessService.class);
-        return service.business(null, fromUserId, toUserId, amount, remark) ? "FAIL" : "OK";
+        return service.business(null, fromUserId, toUserId, amount, remark) ? "OK" : "FAIL";
     }
 }

@@ -5,3 +5,15 @@
 
 
 TCC模式下try、comfirm、cancel 必须要用接口定义，不能直接用具体类
+
+
+TCC模式下整体代理过程
+GlobalTransactionScanner
+       |-- 扫描需要被代理的类(TCC:com.xxx.consumer.TccBusinessServiceImpl)的接口是否被@LocalTCC注解
+       v
+TccActionInterceptor
+       |-- 被代理的类会被AOP的方法拦截器拦截(三阶段的try)
+       v
+AbstractResourceManager     :ResourceManager/TCCResourceManager ...
+       |-- 掌管事务的commit(三阶段的confirm)和rollback(三阶段的cancel)
+       v

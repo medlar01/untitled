@@ -14,7 +14,7 @@ public class SELUtils {
      * @虚引用PhantomReference: 唯一的用处：能在对象被GC时收到系统通知，JAVA中用PhantomReference来实现虚引用
      */
     private static final Map<String, WeakReference<Expression>> cached = new HashMap<>();
-    private static final Timer timer = new Timer();
+    private static final Timer timer = new Timer(true); // 守护线程方式创建
     static {
         timer.schedule(new TimerTask() {
             @Override

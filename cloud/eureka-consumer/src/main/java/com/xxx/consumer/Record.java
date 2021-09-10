@@ -7,7 +7,7 @@ import javax.persistence.*;
 @Data
 @Entity
 @Table(name = "t_record")
-public class Record {
+public class Record implements Ask {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

@@ -2,6 +2,7 @@ package com.xxx.consumer;
 
 import io.seata.spring.annotation.GlobalLock;
 import io.seata.spring.annotation.GlobalTransactional;
+import lombok.experimental.ExtensionMethod;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,10 +10,15 @@ import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
 
 /**
  * 上游服务
@@ -20,6 +26,7 @@ import org.springframework.web.client.RestTemplate;
 @RequestMapping
 @EnableJpaRepositories
 @SpringBootApplication
+@ExtensionMethod({Extensions.class})
 public class EurekaConsumerApplication {
     private static ListableBeanFactory beanFactory;
 
@@ -64,6 +71,26 @@ public class EurekaConsumerApplication {
 //        } catch (Exception e) {
 //            return "FAIL";
 //        }
+    }
+
+    @ResponseBody
+    @RequestMapping(method = RequestMethod.GET, value = "spring/el/{i}")
+    public String sel(@PathVariable int i) {
+        List<Record> list = new Vector<>();
+        System.out.println("list:" + list.hashCode());
+        Record record = new Record();
+        record.setAmount(1000.0d);
+        list.add(record);
+        System.out.println("list:" + list.hashCode());
+        if (i == 1) {
+            list.add(null);
+        }
+        System.out.println("list:" + list.hashCode());
+        var amount = list.ask("get(0)?.amount");
+        var obj = list.ask("get(1)?.amount");
+        var str = list.ask("get(0)?.remark?:''");
+//        System.gc();
+        return "OK";
     }
 
     @ResponseBody

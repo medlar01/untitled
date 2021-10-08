@@ -9,6 +9,9 @@ subprojects {
         mavenLocal()
         mavenCentral()
     }
+    tasks.withType(JavaCompile) {
+        options.encoding = "utf-8"
+    }
 }
 
 

@@ -9,6 +9,7 @@ subprojects {
         mavenLocal()
         mavenCentral()
     }
+
     tasks.withType(JavaCompile) {
         options.encoding = "utf-8"
     }
@@ -62,6 +63,6 @@ ext {
             'asm-analysis'                  : 'org.ow2.asm:asm-analysis:9.1',
             'spring-boot-starter-data-jpa'  : 'org.springframework.boot:spring-boot-starter-data-jpa:2.5.2',
             'spring-cloud-alibaba-seata'    : 'com.alibaba.cloud:spring-cloud-starter-alibaba-seata:2.2.1.RELEASE',
-            'seata-spring-boot-starter': 'io.seata:seata-spring-boot-starter:1.4.1'
+            'seata-spring-boot-starter'     : 'io.seata:seata-spring-boot-starter:1.4.1'
     ]
 }

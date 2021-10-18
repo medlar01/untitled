@@ -30,3 +30,27 @@ commit;                                  -- step 7 --|
        step 2 读取时id=7不存在
        step 3~5新增了id 7
        step 6 却读不到id 7
+
+
+
+
+spring 事务级别与传播行为
+
+传播行为
+* 保证同一个事务中
+PROPAGION_REQUIRED:         支持当前事务，如果不存在 就新建一个(默认)
+PROPAGION_SUPPORTS:         支持当前事务，如果不存在，就不使用事务
+PROPAGION_MANDATORY:        支持当前事务，如果不存在，抛出异常
+* 保证没有在同一个事务中
+PROPAGION_REQUIRES_NEW:     如果有事务存在，挂起当前事务，创建一个新的事务
+PROPAGION_NOT_SUPPORTED:    以非事务方式运行，如果有事务存在，挂起当前事务
+PROPAGION_NEVER:            以非事务方式运行，如果有事务存在，抛出异常
+PROPAGION_NESTED:           如果当前事务存在，则嵌套事务执行
+
+
+事务级别
+DEFAULT             默认的隔离级别: 使用数据库默认的事务隔离级别.
+READ_UNCOMMITED     未提交读: 脏读，不可重复读，虚读都有可能发生.
+READ_COMMITED       已提交读: 避免脏读。但是不可重复读和虚读有可能发生.    (需事务提交)
+REPEATABLE_READ     可重复读: 避免脏读和不可重复读.但是虚读有可能发生.     (行锁)
+SERIALIZABLE        串行化的: 避免以上所有读问题.                      (表锁)
